@@ -1,9 +1,10 @@
 window.addEventListener('DOMContentLoaded', async () => {
 
+    // getting data from this url
     const url = 'http://localhost:8000/api/locations/';
 
     const response = await fetch(url);
-    console.log("fdsfgdgfdgfd")
+
     if (response.ok) {
         const data = await response.json();
         console.log(data);
@@ -19,6 +20,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
 
     const formTag = document.getElementById('create-conference-form');
+    
     formTag.addEventListener('submit', async event => {
         event.preventDefault();
 
@@ -26,6 +28,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         const json = JSON.stringify(Object.fromEntries(formData));
         console.log(json)
 
+        // posting the data to this url
         const locationUrl = 'http://localhost:8000/api/conferences/';
         const fetchConfig = {
             method: "POST",
@@ -40,4 +43,4 @@ window.addEventListener('DOMContentLoaded', async () => {
             const newLocation = await response.json();
         }
     })
-})
+});
