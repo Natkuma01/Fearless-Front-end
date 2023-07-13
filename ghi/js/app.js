@@ -18,7 +18,7 @@ function createCard(name, description, pictureUrl, created, ends, venue) {
 
 window.addEventListener('DOMContentLoaded', async () => {
 
-    const url = 'http://localhost:8000/api/conferences/';
+    const url = 'http://localhost:8900/api/conferences/';
   
     try {
       const response = await fetch(url);

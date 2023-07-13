@@ -1,7 +1,6 @@
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 import json
-
 from common.json import ModelEncoder
 from .acls import get_photo, get_weather_data
 from .models import Conference, Location, State
@@ -52,24 +51,6 @@ class ConferenceDetailEncoder(ModelEncoder):
 
 @require_http_methods(["GET", "POST"])
 def api_list_conferences(request):
-    """
-    Lists the conference names and the link to the conference.
-
-    Returns a dictionary with a single key "conferences" which
-    is a list of conference names and URLS. Each entry in the list
-    is a dictionary that contains the name of the conference and
-    the link to the conference's information.
-
-    {
-        "conferences": [
-            {
-                "name": conference's name,
-                "href": URL to the conference,
-            },
-            ...
-        ]
-    }
-    """
     if request.method == "GET":
         conferences = Conference.objects.all()
         return JsonResponse(
@@ -207,22 +188,6 @@ def api_list_locations(request):
 
 @require_http_methods(["DELETE", "GET", "PUT"])
 def api_show_location(request, pk):
-    """
-    Returns the details for the Location model specified
-    by the pk parameter.
-
-    This should return a dictionary with the name, city,
-    room count, created, updated, and state abbreviation.
-
-    {
-        "name": location's name,
-        "city": location's city,
-        "room_count": the number of rooms available,
-        "created": the date/time when the record was created,
-        "updated": the date/time when the record was updated,
-        "state": the two-letter abbreviation for the state,
-    }
-    """
     if request.method == "GET":
         location = Location.objects.get(id=pk)
         return JsonResponse(
@@ -251,3 +216,17 @@ def api_show_location(request, pk):
             encoder=LocationDetailEncoder,
             safe=False,
         )
+    
+
+@require_http_methods(["GET"])
+def api_list_states(request):
+    states = State.objects.all().order_by("name")
+    state_list = []
+    for state in states:
+        dict = {
+            "name": state.name,
+            "abbreviation": state.abbreviation
+        }
+        state_list.append(dict)
+    return JsonResponse({"states": state_list})
+        
