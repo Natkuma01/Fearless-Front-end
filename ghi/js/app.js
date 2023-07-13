@@ -18,7 +18,7 @@ function createCard(name, description, pictureUrl, created, ends, venue) {
 
 window.addEventListener('DOMContentLoaded', async () => {
 
-    const url = 'http://localhost:8900/api/conferences/';
+    const url = 'http://localhost:8000/api/conferences/';
   
     try {
       const response = await fetch(url);
@@ -27,7 +27,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         // Figure out what to do when the response is bad
       } else {
         const data = await response.json();
-  
         // const conference = data.conferences[0];
         // const nameTag = document.querySelector('.card-title');
         // nameTag.innerHTML = conference.name;

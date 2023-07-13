@@ -1,34 +1,34 @@
 window.addEventListener('DOMContentLoaded', async () => {
 
-    const url1 = 'http://localhost:8000/api/states/';
-  
-    const response = await fetch(url1);
-  
+    const url = 'http://localhost:8000/api/locations/';
+
+    const response = await fetch(url);
+    console.log("fdsfgdgfdgfd")
     if (response.ok) {
-      const data = await response.json();
+        const data = await response.json();
         console.log(data);
-      const selectTag = document.getElementById('state');
-   
-    for (let state of data.states) {
+        
+        const selectTag = document.getElementById('location');
+    
+    for (let location of data.locations) {
         const option = document.createElement('option')
-        option.value = state.abbreviation;
-        option.innerHTML = state.name;
+        option.value = location.id
+        option.innerHTML = location.name
         selectTag.appendChild(option)
         }
     }
 
-  
-    const formTag = document.getElementById('create-location-form');
+    const formTag = document.getElementById('create-conference-form');
     formTag.addEventListener('submit', async event => {
-      event.preventDefault();
+        event.preventDefault();
 
         const formData = new FormData(formTag);
         const json = JSON.stringify(Object.fromEntries(formData));
         console.log(json)
 
-        const locationUrl = 'http://localhost:8000/api/locations/';
+        const locationUrl = 'http://localhost:8000/api/conferences/';
         const fetchConfig = {
-            method: "post",
+            method: "POST",
             body: json,
             headers: {
                 'Content-Type': 'application/json',
@@ -38,7 +38,6 @@ window.addEventListener('DOMContentLoaded', async () => {
         if (response.ok) {
             formTag.reset();
             const newLocation = await response.json();
-    }
-
-    });
-  });
+        }
+    })
+})
