@@ -1,3 +1,5 @@
+import React, { useEffect } from 'react';
+
 window.addEventListener('DOMContentLoaded', async () => {
 
     const url1 = 'http://localhost:8000/api/states/';
