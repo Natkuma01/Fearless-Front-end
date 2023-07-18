@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 
-function LocationForm(props) {
+function LocationForm() {
 
     const [states, setStates] = useState([]);
     // states is variable, useState is React 

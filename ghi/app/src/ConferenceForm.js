@@ -1,19 +1,26 @@
-import React, {useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-function AttendConferenceForm() {
+function ConferenceForm() {
+  const [locations, setLocations] = useState([])
 
-  const [conference, setConference] = useState('');
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [conferences, setConferences] = useState([]);
-  const [hasSignedUp, setHasSignedUp] = useState(false);
+  //Notice that we can condense all formData
+  //into one state object
+  const [formData, setFormData] = useState({
+    name: '',
+    starts: '',
+    ends: '',
+    description: '',
+    max_presentations: '',
+    max_attendees: '',
+    location: '',
+  })
 
   const fetchData = async () => {
-    const url = 'http://localhost:8000/api/conferences/';
+    const url = 'http://localhost:8000/api/locations/';
     const response = await fetch(url);
     if (response.ok) {
       const data = await response.json();
-      setConferences(data.conferences);
+      setLocations(data.locations);
     }
   }
 
@@ -23,116 +30,107 @@ function AttendConferenceForm() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = {};
-    data.conference = conference;
-    data.name = name;
-    data.email = email;
 
-    const attendeeUrl = 'http://localhost:8001/api/attendees/';
-    const fetchOptions = {
-      method: 'post',
-      body: JSON.stringify(data),
+    const url = 'http://localhost:8000/api/conferences/';
+
+    const fetchConfig = {
+      method: "post",
+      //Because we are using one formData state object,
+      //we can now pass it directly into our request!
+      body: JSON.stringify(formData),
       headers: {
         'Content-Type': 'application/json',
       },
     };
-    const attendeeResponse = await fetch(attendeeUrl, fetchOptions);
-    if (attendeeResponse.ok) {
-      setConference('');
-      setName('');
-      setEmail('');
-      setHasSignedUp(true);
+
+    const response = await fetch(url, fetchConfig);
+
+    if (response.ok) {
+      //The single formData object
+      //also allows for easier clearing of data
+      setFormData({
+        name: '',
+        starts: '',
+        ends: '',
+        description: '',
+        max_presentations: '',
+        max_attendees: '',
+        location: '',
+      });
     }
   }
 
-  const handleChangeConference = (event) => {
-    const value = event.target.value;
-    setConference(value);
-  }
+  //Notice that we can also replace multiple form change
+  //eventListener functions with one
+  const handleFormChange = (e) => {
+    const value = e.target.value;
+    const inputName = e.target.name;
 
-  const handleChangeName = (event) => {
-    const value = event.target.value;
-    setName(value);
-  }
+    //We can condense our form data event handling
+    //into on function by using the input name to update it
 
-  const handleChangeEmail = (event) => {
-    const value = event.target.value;
-    setEmail(value);
-  }
+    setFormData({
+      //Previous form data is spread (i.e. copied) into our new state object
+      ...formData,
 
-  // CSS classes for rendering
-  let spinnerClasses = 'd-flex justify-content-center mb-3';
-  let dropdownClasses = 'form-select d-none';
-  if (conferences.length > 0) {
-    spinnerClasses = 'd-flex justify-content-center mb-3 d-none';
-    dropdownClasses = 'form-select';
-  }
-
-  let messageClasses = 'alert alert-success d-none mb-0';
-  let formClasses = '';
-  if (hasSignedUp) {
-    messageClasses = 'alert alert-success mb-0';
-    formClasses = 'd-none';
+      //On top of the that data, we add the currently engaged input key and value
+      [inputName]: value
+    });
   }
 
   return (
-    <div className="my-5 container">
-      <div className="row">
-        <div className="col col-sm-auto">
-          <img width="300" className="bg-white rounded shadow d-block mx-auto mb-4" src="/logo.svg" />
-        </div>
-        <div className="col">
-          <div className="card shadow">
-            <div className="card-body">
-              <form className={formClasses} onSubmit={handleSubmit} id="create-attendee-form">
-                <h1 className="card-title">It's Conference Time!</h1>
-                <p className="mb-3">
-                  Please choose which conference
-                  you'd like to attend.
-                </p>
-                <div className={spinnerClasses} id="loading-conference-spinner">
-                  <div className="spinner-grow text-secondary" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <select onChange={handleChangeConference} name="conference" id="conference" className={dropdownClasses} required>
-                    <option value="">Choose a conference</option>
-                    {conferences.map(conference => {
-                      return (
-                        <option key={conference.href} value={conference.href}>{conference.name}</option>
-                      )
-                    })}
-                  </select>
-                </div>
-                <p className="mb-3">
-                  Now, tell us about yourself.
-                </p>
-                <div className="row">
-                  <div className="col">
-                    <div className="form-floating mb-3">
-                      <input onChange={handleChangeName} required placeholder="Your full name" type="text" id="name" name="name" className="form-control" />
-                      <label htmlFor="name">Your full name</label>
-                    </div>
-                  </div>
-                  <div className="col">
-                    <div className="form-floating mb-3">
-                      <input onChange={handleChangeEmail} required placeholder="Your email address" type="email" id="email" name="email" className="form-control" />
-                      <label htmlFor="email">Your email address</label>
-                    </div>
-                  </div>
-                </div>
-                <button className="btn btn-lg btn-primary">I'm going!</button>
-              </form>
-              <div className={messageClasses} id="success-message">
-                Congratulations! You're all signed up!
-              </div>
+    <div className="row">
+      <div className="offset-3 col-6">
+        <div className="shadow p-4 mt-4">
+          <h1>Create a new conference</h1>
+          <form onSubmit={handleSubmit} id="create-conference-form">
+
+            <div className="form-floating mb-3">
+              <input onChange={handleFormChange} placeholder="Name" required type="text" name="name" id="name" className="form-control" />
+              <label htmlFor="name">Name</label>
             </div>
-          </div>
+
+            <div className="form-floating mb-3">
+              <input onChange={handleFormChange} placeholder="Starts" required type="date" name="starts" id="starts" className="form-control" />
+              <label htmlFor="starts">Starts</label>
+            </div>
+
+            <div className="form-floating mb-3">
+              <input onChange={handleFormChange} placeholder="Ends" required type="date" name="ends" id="ends" className="form-control" />
+              <label htmlFor="ends">Ends</label>
+            </div>
+
+            <div className="mb-3">
+              <label htmlFor="description">Description</label>
+              <textarea onChange={handleFormChange} className="form-control" id="description" rows="3" name="description" className="form-control"></textarea>
+            </div>
+
+            <div className="form-floating mb-3">
+              <input onChange={handleFormChange} placeholder="Maximum presentations" required type="number" name="max_presentations" id="max_presentations" className="form-control" />
+              <label htmlFor="max_presentations">Maximum presentations</label>
+            </div>
+
+            <div className="form-floating mb-3">
+              <input onChange={handleFormChange} placeholder="Maximum attendees" required type="number" name="max_attendees" id="max_attendees" className="form-control" />
+              <label htmlFor="max_attendees">Maximum attendees</label>
+            </div>
+
+            <div className="mb-3">
+              <select onChange={handleFormChange} required name="location" id="location" className="form-select">
+                <option value="">Choose a location</option>
+                {locations.map(location => {
+                  return (
+                    <option key={location.id} value={location.id}>{location.name}</option>
+                  )
+                })}
+              </select>
+            </div>
+            <button className="btn btn-primary">Create</button>
+          </form>
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-export default AttendConferenceForm;
+export default ConferenceForm;
