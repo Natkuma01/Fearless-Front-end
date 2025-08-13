@@ -14,7 +14,7 @@ from attendees.models import ConferenceVO
 
 
 def get_conferences():
-    response = requests.get("http://monolith:8000/api/conferences/")
+    response = requests.get("http://monolith:8000/api/conferences/", timeout=60)
     content = json.loads(response.content)
     for conference in content["conferences"]:
         ConferenceVO.objects.update_or_create(
