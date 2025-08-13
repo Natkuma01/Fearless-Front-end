@@ -13,7 +13,7 @@ def get_weather_data(city, state):
         "appid": OPEN_WEATHER_API_KEY,
     }
     url = "http://api.openweathermap.org/geo/1.0/direct"
-    response = requests.get(url, params=params)
+    response = requests.get(url, params=params, timeout=60)
     content = json.loads(response.content)
 
     try:
@@ -29,7 +29,7 @@ def get_weather_data(city, state):
         "units": "imperial",
     }
     url = "https://api.openweathermap.org/data/2.5/weather"
-    response = requests.get(url, params=params)
+    response = requests.get(url, params=params, timeout=60)
     content = json.loads(response.content)
 
     try:
@@ -48,7 +48,7 @@ def get_photo(city, state):
         "query": f"downtown {city} {state}",
     }
     url = "https://api.pexels.com/v1/search"
-    response = requests.get(url, params=params, headers=headers)
+    response = requests.get(url, params=params, headers=headers, timeout=60)
     content = json.loads(response.content)
     try:
         return {"picture_url": content["photos"][0]["src"]["original"]}
